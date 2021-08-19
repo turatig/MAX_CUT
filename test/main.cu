@@ -7,6 +7,7 @@
 #include "../inc/rete.h"
 #include "../inc/rete_gpu.cuh"
 #include "../inc/Graph.cuh"
+#include "../inc/utils.cuh"
 
 /*
 Function used to check the correctness of the parallel algorithm with respect to its sequential implementation
@@ -25,18 +26,19 @@ int main(){
     cudaGetDevice(&dev);
     cudaGetDeviceProperties(&props,dev);
     std::cout<<"Compute capability "<<props.major<<"."<<props.minor<<"\n";*/
+    double start,elapsed;
 
-    Graph g=Graph("graph.txt");
+    Graph g=Graph(5000,50);
     inizializza_strutture(g.getAdjmat(),g.getSize());
-    stampa_Adjmat();
+    start=cpuSecond();
     stabilizza_rete_Hopfield();
-    stampa_stato_rete();
+    elapsed=cpuSecond()-start;
+    std::cout<<"Sequential implementation ended in "<<elapsed<<" sec\n";
     
-    std::cout<<"GPU is starting to compute\n";
+    start=cpuSecond();
     int *status=stabilizeHopfieldNet(g);
-    std::cout<<"GPU finished\n";
-    for(int i=0;i<g.getSize();i++)
-        std::cout<<(int)((status[i]+1)/2)<<" ";
+    elapsed=cpuSecond()-start;
+    std::cout<<"Parallel implementation ended in "<<elapsed<<" sec\n";
 
     std::cout<<"\n";
     if(check_output(get_stato_rete(),status,g.getSize()))

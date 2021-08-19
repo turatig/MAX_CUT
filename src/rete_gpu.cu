@@ -8,22 +8,16 @@ Update the status of the i-th node in the graph by summing
 #include <stdio.h>
 #include <iostream>
 #include "../inc/Graph.cuh"
+#include "../inc/utils.cuh"
 
+#define THREADS_PER_BLOCK 256
 
-#define gpuErrCheck(ans) { gpuAssert((ans), __FILE__, __LINE__); }
-inline void gpuAssert(cudaError_t code, const char *file, int line, bool abort=true){
-    if (code != cudaSuccess) {
-        fprintf(stderr,"GPUassert: %s %s %d\n", cudaGetErrorString(code), file, line);
-        if (abort) exit(code);
-    }
-}
-
-__global__ void statusUpdate(int *adjlist,int *status,int size,int *res){
+__global__ void statusUpdate(int **adjmat,int node,int *status,int size,int *res){
     /*declare smem to have a size equal to the double of the max number of threads per block*/
-    __shared__ int smem[2048];
+    __shared__ int smem[THREADS_PER_BLOCK];
     int n=blockIdx.x*blockDim.x+threadIdx.x;
     
-    if(n<size)  smem[threadIdx.x]=-(adjlist[n]*status[n]);
+    if(n<size)  smem[threadIdx.x]=-(adjmat[node][n]*status[n]);
     else smem[threadIdx.x]=0;
 
     __syncthreads();
@@ -36,23 +30,20 @@ __global__ void statusUpdate(int *adjlist,int *status,int size,int *res){
     if(threadIdx.x==0) res[blockIdx.x]=smem[0];
 }
 
-/*  -txb: threads_per_block
-*/
-int *stabilizeHopfieldNet(Graph g,int txb){
+int *stabilizeHopfieldNet(Graph g){
     int *status;
     int *res;
     int n,prev;
+    int **adjmat=g.getAdjmat();
     
-    std::cout<<"Graph obj is\n";
-    g.print();
 
     gpuErrCheck(cudaMallocManaged((void**)&status,g.getSize()*sizeof(int)));
     for(int i=0;i<g.getSize();i++) status[i]=0;
     bool end=false;
     
-    int n_blocks=(int)(g.getSize()+txb-1)/txb;
+    int n_blocks=(int)(g.getSize()+THREADS_PER_BLOCK-1)/THREADS_PER_BLOCK;
     gpuErrCheck(cudaMallocManaged((void**)&res,n_blocks*sizeof(int)));
-    int count=0;
+    //int count=0;
 
     while(!end/*&&count<2*/){
         end=true;
@@ -70,7 +61,7 @@ int *stabilizeHopfieldNet(Graph g,int txb){
 
             /*Compute sum reduction on device*/
             //std::cout<<"Calling kernel\n";
-            statusUpdate<<<n_blocks,txb>>>(g.getAdjmat()[i],status,g.getSize(),res);
+            statusUpdate<<<n_blocks,THREADS_PER_BLOCK>>>(adjmat,i,status,g.getSize(),res);
             gpuErrCheck(cudaDeviceSynchronize());
             //std::cout<<"Kernel terminated successfully\n";
             

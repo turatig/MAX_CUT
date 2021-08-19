@@ -20,7 +20,7 @@ Graph::Graph(int s,int p){
 
             else{
 
-                if(rand()%100<p){  adjmat[i][j]=1; }
+                if(i!=j&&rand()%100<p){  adjmat[i][j]=1; }
                 else{ adjmat[i][j]=0; }
 
             }
