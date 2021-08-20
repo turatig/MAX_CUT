@@ -31,10 +31,12 @@ __global__ void statusUpdate(int **adjmat,int node,int *status,int size,int *res
 }
 
 int *stabilizeHopfieldNet(Graph g){
+    ofstream out;
     int *status;
     int *res;
-    int n,prev;
+    int n,prev,count=0;
     int **adjmat=g.getAdjmat();
+    double start,elapsed;
     
 
     gpuErrCheck(cudaMallocManaged((void**)&status,g.getSize()*sizeof(int)));
@@ -44,8 +46,9 @@ int *stabilizeHopfieldNet(Graph g){
     int n_blocks=(int)(g.getSize()+THREADS_PER_BLOCK-1)/THREADS_PER_BLOCK;
     gpuErrCheck(cudaMallocManaged((void**)&res,n_blocks*sizeof(int)));
     //int count=0;
-
-    while(!end/*&&count<2*/){
+    
+    out.open("out.txt");
+    while(!end&&count<2){
         end=true;
         for(int i=0;i<g.getSize();i++){
             
@@ -61,8 +64,11 @@ int *stabilizeHopfieldNet(Graph g){
 
             /*Compute sum reduction on device*/
             //std::cout<<"Calling kernel\n";
+            start=cpuSecond();
             statusUpdate<<<n_blocks,THREADS_PER_BLOCK>>>(adjmat,i,status,g.getSize(),res);
             gpuErrCheck(cudaDeviceSynchronize());
+            elapsed=cpuSecond()-start;
+            out<<std::fixed<<"GPU reduction took "<<elapsed<<"sec\n";
             //std::cout<<"Kernel terminated successfully\n";
             
             /*Sum partial results together*/
@@ -79,9 +85,10 @@ int *stabilizeHopfieldNet(Graph g){
             if(status[i]!=prev) end=false;
         }
         /*std::cout<<"-------ITERATION "<<count<<"-------\n";
-        std::cout<<"End of the cycle: "<<end<<"\n";
-        count+=1;*/
+        std::cout<<"End of the cycle: "<<end<<"\n";*/
+        count++;
     }
+    out.close();
     
     return status;
 }

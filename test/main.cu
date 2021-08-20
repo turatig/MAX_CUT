@@ -4,7 +4,7 @@
 #include <time.h>
 #include <math.h>
 #include "../inc/graph_gen.h"
-#include "../inc/rete.h"
+#include "../inc/rete_cpu.cuh"
 #include "../inc/rete_gpu.cuh"
 #include "../inc/Graph.cuh"
 #include "../inc/utils.cuh"
@@ -28,7 +28,7 @@ int main(){
     std::cout<<"Compute capability "<<props.major<<"."<<props.minor<<"\n";*/
     double start,elapsed;
 
-    Graph g=Graph(5000,50);
+    Graph g=Graph(1000,50);
     inizializza_strutture(g.getAdjmat(),g.getSize());
     start=cpuSecond();
     stabilizza_rete_Hopfield();
