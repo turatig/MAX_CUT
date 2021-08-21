@@ -5,5 +5,5 @@ inline void gpuAssert(cudaError_t code, const char *file, int line, bool abort=t
     }
 }
 
-inline void gpuErrCheck(cudaError_t ans) { gpuAssert((ans), __FILE__, __LINE__); }
+#define gpuErrCheck( ans) { gpuAssert((ans), __FILE__, __LINE__); }
 double cpuSecond();

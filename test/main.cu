@@ -28,7 +28,7 @@ int main(){
     std::cout<<"Compute capability "<<props.major<<"."<<props.minor<<"\n";*/
     double start,elapsed;
 
-    Graph g=Graph(1000,50);
+    Graph g=Graph(10000,50);
     inizializza_strutture(g.getAdjmat(),g.getSize());
     start=cpuSecond();
     stabilizza_rete_Hopfield();

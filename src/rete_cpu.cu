@@ -52,15 +52,12 @@ void energia()
 /****************************************************************/
 
 void stabilizza_rete_Hopfield() {
-    std::ofstream out;
   register int i,j;
   int pred, FINE=1, somme;
   int count=0;
   double start,elapsed;
     
-    out.open("out.txt");
-    //std::cout<<"CPU GROSSI CODE"<<"\n";
-  while (FINE&&count<2) {
+  while (FINE) {
     FINE = 0;
     for (i=0; i<N; i++) {
       somme = 0;
@@ -75,7 +72,7 @@ void stabilizza_rete_Hopfield() {
       for (j=0; j<N; j++)
         somme -= Adjmat[i][j]*stato_rete[j];
     elapsed=cpuSecond()-start;
-    out<<std::fixed<<"CPU reduction took "<<elapsed<<" sec\n";
+    //std::cout<<std::fixed<<"CPU reduction took "<<elapsed<<" sec\n";
     
     //std::cout<<"Sum="<<somme<<"-------\n";
 
@@ -92,9 +89,7 @@ void stabilizza_rete_Hopfield() {
         FINE = 1;   
     }
     /*std::cout<<"-------ITERATION "<<count<<"-------\n";*/
-    count++;
   }
-  out.close();
 }
 
 /****************************************************************/

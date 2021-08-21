@@ -12,12 +12,12 @@ Update the status of the i-th node in the graph by summing
 
 #define THREADS_PER_BLOCK 256
 
-__global__ void statusUpdate(int **adjmat,int node,int *status,int size,int *res){
+__global__ void statusUpdate(int *adjmat,int node,int *status,int size,int *res){
     /*declare smem to have a size equal to the double of the max number of threads per block*/
     __shared__ int smem[THREADS_PER_BLOCK];
     int n=blockIdx.x*blockDim.x+threadIdx.x;
     
-    if(n<size)  smem[threadIdx.x]=-(adjmat[node][n]*status[n]);
+    if(n<size)  smem[threadIdx.x]=-(adjmat[node*size+n]*status[n]);
     else smem[threadIdx.x]=0;
 
     __syncthreads();
@@ -31,24 +31,28 @@ __global__ void statusUpdate(int **adjmat,int node,int *status,int size,int *res
 }
 
 int *stabilizeHopfieldNet(Graph g){
-    ofstream out;
     int *status;
+    int *status_cpu;
     int *res;
+    int *res_cpu;
     int n,prev,count=0;
-    int **adjmat=g.getAdjmat();
+    int *adjmat=g.getDevicePointer();
     double start,elapsed;
     
 
-    gpuErrCheck(cudaMallocManaged((void**)&status,g.getSize()*sizeof(int)));
-    for(int i=0;i<g.getSize();i++) status[i]=0;
+    gpuErrCheck(cudaMalloc((void**)&status,g.getSize()*sizeof(int)));
+    gpuErrCheck(cudaMallocHost((void**)&status_cpu,g.getSize()*sizeof(int)));
+
+    for(int i=0;i<g.getSize();i++) status_cpu[i]=0;
+    gpuErrCheck(cudaMemcpy(status,status_cpu,g.getSize()*sizeof(int),cudaMemcpyHostToDevice));
+
     bool end=false;
     
     int n_blocks=(int)(g.getSize()+THREADS_PER_BLOCK-1)/THREADS_PER_BLOCK;
-    gpuErrCheck(cudaMallocManaged((void**)&res,n_blocks*sizeof(int)));
-    //int count=0;
+    gpuErrCheck(cudaMalloc((void**)&res,n_blocks*sizeof(int)));
+    gpuErrCheck(cudaMallocHost((void**)&res_cpu,n_blocks*sizeof(int)));
     
-    out.open("out.txt");
-    while(!end&&count<2){
+    while(!end){
         end=true;
         for(int i=0;i<g.getSize();i++){
             
@@ -68,27 +72,32 @@ int *stabilizeHopfieldNet(Graph g){
             statusUpdate<<<n_blocks,THREADS_PER_BLOCK>>>(adjmat,i,status,g.getSize(),res);
             gpuErrCheck(cudaDeviceSynchronize());
             elapsed=cpuSecond()-start;
-            out<<std::fixed<<"GPU reduction took "<<elapsed<<"sec\n";
+            //std::cout<<std::fixed<<"GPU reduction took "<<elapsed<<"sec\n";
             //std::cout<<"Kernel terminated successfully\n";
             
             /*Sum partial results together*/
             n=0;
             /*std::cout<<"n_blocks "<<n_blocks<<"\n";
             std::cout<<"Sum "<<res[0]<<"\n";*/
-            for(int j=0;j<n_blocks;j++) n+=res[j];
+            gpuErrCheck(cudaMemcpy(res_cpu,res,n_blocks*sizeof(int),cudaMemcpyDeviceToHost));
+            for(int j=0;j<n_blocks;j++) n+=res_cpu[j];
             //std::cout<<"Sum="<<n<<"\n";
-            prev=status[i];
+            prev=status_cpu[i];
 
-            if(n<0) status[i]=-1;
-            else status[i]=1;
+            if(n<0) status_cpu[i]=-1;
+            else status_cpu[i]=1;
 
-            if(status[i]!=prev) end=false;
+            if(status_cpu[i]!=prev) end=false;
+
+            gpuErrCheck(cudaMemcpy(&status[i],&status_cpu[i],sizeof(int),cudaMemcpyHostToDevice));
         }
         /*std::cout<<"-------ITERATION "<<count<<"-------\n";
         std::cout<<"End of the cycle: "<<end<<"\n";*/
-        count++;
     }
-    out.close();
+    cudaFree(res);
+    cudaFree(status);
     
-    return status;
+    cudaFreeHost(res_cpu);
+
+    return status_cpu;
 }

@@ -5,10 +5,12 @@ Class to manage a random generated undirected graph.
 #define GRAPH
 class Graph{
     private:
-        /*  -adjmat: adjacency matrix. Allocated both on host and device.
+        /*  -adjmat: adjacency matrix. Host memory pointer.
+            -gpu_adjmat: adjacency matrix. Device memory pointer. In linearized form.
             -size: number of nodes in the graph.
         */
         int **adjmat;
+        int *gpu_adjmat;
         int size;
     public:
         /*  -s: size.
@@ -19,6 +21,7 @@ class Graph{
         Graph(char *argv);
         ~Graph();
         int **getAdjmat();
+        int *getDevicePointer();
         int getSize();
         void print();
 };
