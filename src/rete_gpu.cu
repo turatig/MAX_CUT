@@ -16,16 +16,38 @@ __global__ void statusUpdate(int *adjmat,int node,int *status,int size,int *res)
     /*declare smem to have a size equal to the double of the max number of threads per block*/
     __shared__ int smem[THREADS_PER_BLOCK];
     int n=blockIdx.x*blockDim.x+threadIdx.x;
-    
+    int i;
+
     if(n<size)  smem[threadIdx.x]=-(adjmat[node*size+n]*status[n]);
     else smem[threadIdx.x]=0;
 
     __syncthreads();
     
-    for(int i=2;i<=blockDim.x;i*=2){
+    for(i=2;blockDim.x/i>32;i<<=1){
         if(threadIdx.x<blockDim.x/i) smem[threadIdx.x]+=smem[threadIdx.x+blockDim.x/i];
         __syncthreads();
     }
+
+    /*
+    Unrolling of the last five iterations (when only one warp is invloved) of the cycle to improve efficiency
+    */
+    if(threadIdx.x<blockDim.x/i) smem[threadIdx.x]+=smem[threadIdx.x+blockDim.x/i];
+     __syncthreads();
+     i<<=1;
+    if(threadIdx.x<blockDim.x/i) smem[threadIdx.x]+=smem[threadIdx.x+blockDim.x/i];
+     __syncthreads();
+     i<<=1;
+    if(threadIdx.x<blockDim.x/i) smem[threadIdx.x]+=smem[threadIdx.x+blockDim.x/i];
+     __syncthreads();
+     i<<=1;
+    if(threadIdx.x<blockDim.x/i) smem[threadIdx.x]+=smem[threadIdx.x+blockDim.x/i];
+     __syncthreads();
+     i<<=1;
+    if(threadIdx.x<blockDim.x/i) smem[threadIdx.x]+=smem[threadIdx.x+blockDim.x/i];
+     __syncthreads();
+     i<<=1;
+    if(threadIdx.x<blockDim.x/i) smem[threadIdx.x]+=smem[threadIdx.x+blockDim.x/i];
+     __syncthreads();
 
     if(threadIdx.x==0) res[blockIdx.x]=smem[0];
 }
@@ -37,7 +59,7 @@ int *stabilizeHopfieldNet(Graph g){
     int *res_cpu;
     int n,prev,count=0;
     int *adjmat=g.getDevicePointer();
-    double start,elapsed;
+    //double start,elapsed;
     
 
     gpuErrCheck(cudaMalloc((void**)&status,g.getSize()*sizeof(int)));
@@ -68,10 +90,10 @@ int *stabilizeHopfieldNet(Graph g){
 
             /*Compute sum reduction on device*/
             //std::cout<<"Calling kernel\n";
-            start=cpuSecond();
+            //start=cpuSecond();
             statusUpdate<<<n_blocks,THREADS_PER_BLOCK>>>(adjmat,i,status,g.getSize(),res);
             gpuErrCheck(cudaDeviceSynchronize());
-            elapsed=cpuSecond()-start;
+            //elapsed=cpuSecond()-start;
             //std::cout<<std::fixed<<"GPU reduction took "<<elapsed<<"sec\n";
             //std::cout<<"Kernel terminated successfully\n";
             

@@ -55,7 +55,7 @@ void stabilizza_rete_Hopfield() {
   register int i,j;
   int pred, FINE=1, somme;
   int count=0;
-  double start,elapsed;
+ // double start,elapsed;
     
   while (FINE) {
     FINE = 0;
@@ -68,10 +68,10 @@ void stabilizza_rete_Hopfield() {
             for(int k=0;k<N;k++)std::cout<<stato_rete[k]<<" ";
             std::cout<<"\n";*/
       // somma pesata dei vicini
-        start=cpuSecond();
+       // start=cpuSecond();
       for (j=0; j<N; j++)
         somme -= Adjmat[i][j]*stato_rete[j];
-    elapsed=cpuSecond()-start;
+    //elapsed=cpuSecond()-start;
     //std::cout<<std::fixed<<"CPU reduction took "<<elapsed<<" sec\n";
     
     //std::cout<<"Sum="<<somme<<"-------\n";
