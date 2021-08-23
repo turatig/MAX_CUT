@@ -55,26 +55,15 @@ void stabilizza_rete_Hopfield() {
   register int i,j;
   int pred, FINE=1, somme;
   int count=0;
- // double start,elapsed;
     
   while (FINE) {
     FINE = 0;
     for (i=0; i<N; i++) {
       somme = 0;
-            /*std::cout<<"Adjacency list of the node "<<i<<"\n";
-            for(int k=0;k<N;k++) std::cout<<Adjmat[i][k]<<" ";
-            std::cout<<"\n";
-            std::cout<<"Status of the network\n";
-            for(int k=0;k<N;k++)std::cout<<stato_rete[k]<<" ";
-            std::cout<<"\n";*/
       // somma pesata dei vicini
-       // start=cpuSecond();
       for (j=0; j<N; j++)
         somme -= Adjmat[i][j]*stato_rete[j];
-    //elapsed=cpuSecond()-start;
-    //std::cout<<std::fixed<<"CPU reduction took "<<elapsed<<" sec\n";
     
-    //std::cout<<"Sum="<<somme<<"-------\n";
 
 
       // analisi dello stato
@@ -88,7 +77,6 @@ void stabilizza_rete_Hopfield() {
       if (pred != stato_rete[i]) 
         FINE = 1;   
     }
-    /*std::cout<<"-------ITERATION "<<count<<"-------\n";*/
   }
 }
 
@@ -120,14 +108,7 @@ void stabilizza_rete_Hopfield() {
 void inizializza_strutture(int **adjmat,int size){
     N = size;
     stato_rete = (int *) malloc(N*sizeof(int));
-    Adjmat = (Row *) malloc(N*sizeof(Row));
-   
-    for (int i=0; i<N; i++) {
-      Adjmat[i] = (int *) malloc(N*sizeof(int));
-      stato_rete[i] = 0;
-      for(int j=0; j<N; j++)
-        Adjmat[i][j] = adjmat[i][j];
-    }
+    Adjmat=adjmat;
 }
 /**************************************************************/
 
