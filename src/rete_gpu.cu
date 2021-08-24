@@ -18,7 +18,7 @@ __global__ void statusUpdate(int *adjmat,int node,int *status,int size,int *res)
     int n=blockIdx.x*blockDim.x+threadIdx.x;
     int i;
 
-    if(n<size)  smem[threadIdx.x]=-(adjmat[node*size+n]*status[n]);
+    if(n<size)  smem[threadIdx.x]=-(adjmat[node*(size)+n]*status[n]);
     else smem[threadIdx.x]=0;
 
     __syncthreads();

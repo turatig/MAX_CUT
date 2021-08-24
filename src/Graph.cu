@@ -6,7 +6,8 @@
 #include "../inc/Graph.cuh"
 
 Graph::Graph(int s,int p){
-    size=s;   
+    size=s;
+
     adjmat=(int**)malloc(size*sizeof(int*));
     gpuErrCheck(cudaMalloc((void**)&gpu_adjmat,size*size*sizeof(int)));
     

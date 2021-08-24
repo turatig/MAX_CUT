@@ -126,7 +126,7 @@ void stampa_teta() {
 
 /******************************    Main     ******************************/
 
-int main(int argc, char *argv[]) {
+/*int main(int argc, char *argv[]) {
 	register int k;
 	int OK = 1, nround = 0;
 	double p;
@@ -151,7 +151,7 @@ int main(int argc, char *argv[]) {
 	stampa_teta();
 	printf("Num rounds = %d\n",nround);
 	return(0);
-}
+}*/
 
 
 

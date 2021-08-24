@@ -20,12 +20,6 @@ bool check_output(int *seq_partitions,int *par_partitions,int size){
 }
 
 int main(){
-    /*Logging gpu infos*/
-    /*int dev;
-    cudaDeviceProp props;
-    cudaGetDevice(&dev);
-    cudaGetDeviceProperties(&props,dev);
-    std::cout<<"Compute capability "<<props.major<<"."<<props.minor<<"\n";*/
     double start,elapsed;
 
     Graph g=Graph(10000,50);
