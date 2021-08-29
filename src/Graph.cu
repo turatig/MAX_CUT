@@ -11,7 +11,7 @@ Graph::Graph(int s,int p){
     adjmat=(int**)malloc(size*sizeof(int*));
     gpuErrCheck(cudaMalloc((void**)&gpu_adjmat,size*size*sizeof(int)));
     
-    srand(time(NULL));
+    //srand(time(NULL));
     for(int i=0;i<size;i++){
 
         adjmat[i]=(int*)malloc(size*sizeof(int));

@@ -1,3 +1,5 @@
+#ifndef RETE_GPU
+#define RETE_GPU
 /*  -adjmat: adjacency matrix 
     -node: node index
     -status: vector representing the status of the network: status[i]=-1/1 -> node[i] belongs to partition -1/1
@@ -9,4 +11,5 @@
 void statusUpdate(int **adjmat,int node,int *status,int size,int *res);
 /*  -g: Graph object representing the graph
 */
-int *stabilizeHopfieldNet(Graph g);
+int *stabilizeHopfieldNet(Graph *g);
+#endif

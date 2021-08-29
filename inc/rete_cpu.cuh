@@ -1,7 +1,7 @@
-void stampa_stato_rete();
-void energia();
-void stabilizza_rete_Hopfield();
-void stampa_Adjmat();
-void inizializza_strutture(char *argv);
-void inizializza_strutture(int **adjmat,int size);
-int *get_stato_rete();
+#ifndef RETE_CPU
+#define RETE_CPU
+namespace rete_cpu{
+    void energia(int **adjmat,int *stato_rete,int size);
+    int *stabilizza_rete_Hopfield(int **adjmat,int size);
+}
+#endif

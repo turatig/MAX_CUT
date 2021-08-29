@@ -18,51 +18,34 @@ grafo basato su di una successione di reti di Hopfield discrete.
 #include "../inc/rete_cpu.cuh"
 #include "../inc/utils.cuh"
 
+/****************************************************************/
 
-FILE *in;
-typedef int *Row;
-static int N, *stato_rete;                 
-static Row *Adjmat;
+void rete_cpu::energia(int **adjmat,int *stato_rete,int size)
+{
+  register int i,j;
+  int s=0;
 
-/**************************************************************/
-
-void stampa_stato_rete() {
-  int i;
-
-  printf("\n\n Stato della rete:\n");
-  for (i=0; i<N; i++)
-    printf("%3d", (stato_rete[i]+1)/2 );
-  printf("\n");
+  for (i=0; i<size-1; i++)
+    for (j=i+1; j<size; j++)
+      s += adjmat[i][j]*(1 - stato_rete[i]*stato_rete[j]); 
+  printf("\n Energia -> %d\n",s/2);
 }
 
 /****************************************************************/
 
-void energia()
-{
-  register int i,j;
-  int s=0;
-  static int T=0;
-
-  for (i=0; i<N-1; i++)
-    for (j=i+1; j<N; j++)
-      s += Adjmat[i][j]*(1 - stato_rete[i]*stato_rete[j]); 
-  printf("\n Energia -> %d\n",s/2);
-  }
-
-/****************************************************************/
-
-void stabilizza_rete_Hopfield() {
+int *rete_cpu::stabilizza_rete_Hopfield(int **adjmat,int size) {
   register int i,j;
   int pred, FINE=1, somme;
   int count=0;
+  int *stato_rete=(int*)calloc(size,sizeof(int));
     
   while (FINE) {
     FINE = 0;
-    for (i=0; i<N; i++) {
+    for (i=0; i<size; i++) {
       somme = 0;
       // somma pesata dei vicini
-      for (j=0; j<N; j++)
-        somme -= Adjmat[i][j]*stato_rete[j];
+      for (j=0; j<size; j++)
+        somme -= adjmat[i][j]*stato_rete[j];
     
 
 
@@ -78,53 +61,9 @@ void stabilizza_rete_Hopfield() {
         FINE = 1;   
     }
   }
+  return stato_rete;
 }
 
-/****************************************************************/
-
-  void inizializza_strutture(char *argv) {
-    register int i,j;
-    char s[11];
-
-    if( (in = fopen(argv,"r")) == NULL ) {
-      printf("File non trovato!\n");
-      exit(1);
-    }
-
-    N = atoi( fgets(s,10,in));
-    stato_rete = (int *) malloc(N*sizeof(int));
-    Adjmat = (Row *) malloc(N*sizeof(Row));
-   
-    for (i=0; i<N; i++) {
-      Adjmat[i] = (int *) malloc(N*sizeof(int));
-      stato_rete[i] = 0;
-      for(j=0; j<N; j++)
-        Adjmat[i][j] = fgetc(in)-48;
-      fgetc(in);
-    }
-   fclose(in);
- }
-
-void inizializza_strutture(int **adjmat,int size){
-    N = size;
-    stato_rete = (int *) malloc(N*sizeof(int));
-    Adjmat=adjmat;
-}
-/**************************************************************/
-
- void stampa_Adjmat() {
-  int i,j;
-
-  printf("\n Matrice di incidenza del Grafo:\n");
-  for (i=0; i<N; i++) {
-    for (j=0; j<N; j++)
-      printf("%3d", Adjmat[i][j] );
-    printf("\n");
- }
- printf("\n");
-}
-
-int *get_stato_rete(){ return stato_rete;}
 /******************************    Main     ******************************/
 
 /*int main(int argc, char *argv[]) {

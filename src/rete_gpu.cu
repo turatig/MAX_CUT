@@ -7,6 +7,7 @@ Update the status of the i-th node in the graph by summing
 */
 #include <stdio.h>
 #include <iostream>
+#include "../inc/rete_gpu.cuh"
 #include "../inc/Graph.cuh"
 #include "../inc/utils.cuh"
 
@@ -52,29 +53,29 @@ __global__ void statusUpdate(int *adjmat,int node,int *status,int size,int *res)
     if(threadIdx.x==0) res[blockIdx.x]=smem[0];
 }
 
-int *stabilizeHopfieldNet(Graph g){
+int *stabilizeHopfieldNet(Graph *g){
     int *status;
     int *status_cpu;
     int *res;
     int *res_cpu;
     int n,prev;
-    int *adjmat=g.getDevicePointer();
+    int *adjmat=g->getDevicePointer();
     
     
     /*
     Alloc status and results array as zero-copy memory to avoid explicit transfer while looping
     */
-    /*gpuErrCheck(cudaMallocHost((void**)&status_cpu,g.getSize()*sizeof(int)));
-    gpuErrCheck(cudaMalloc((void**)&status,g.getSize()*sizeof(int)));*/
-    gpuErrCheck(cudaHostAlloc((void**)&status_cpu,g.getSize()*sizeof(int),cudaHostAllocMapped));
+    /*gpuErrCheck(cudaMallocHost((void**)&status_cpu,g->getSize()*sizeof(int)));
+    gpuErrCheck(cudaMalloc((void**)&status,g->getSize()*sizeof(int)));*/
+    gpuErrCheck(cudaHostAlloc((void**)&status_cpu,g->getSize()*sizeof(int),cudaHostAllocMapped));
     gpuErrCheck(cudaHostGetDevicePointer((void**)&status,(void*)status_cpu,0));
 
-    for(int i=0;i<g.getSize();i++) status_cpu[i]=0;
-    //gpuErrCheck(cudaMemcpy(status,status_cpu,g.getSize()*sizeof(int),cudaMemcpyHostToDevice));
+    for(int i=0;i<g->getSize();i++) status_cpu[i]=0;
+    //gpuErrCheck(cudaMemcpy(status,status_cpu,g->getSize()*sizeof(int),cudaMemcpyHostToDevice));
 
     bool end=false;
     
-    int n_blocks=(int)(g.getSize()+THREADS_PER_BLOCK-1)/THREADS_PER_BLOCK;
+    int n_blocks=(int)(g->getSize()+THREADS_PER_BLOCK-1)/THREADS_PER_BLOCK;
     /*gpuErrCheck(cudaMalloc((void**)&res,n_blocks*sizeof(int)));
     gpuErrCheck(cudaMallocHost((void**)&res_cpu,n_blocks*sizeof(int)));*/
     gpuErrCheck(cudaHostAlloc((void**)&res_cpu,n_blocks*sizeof(int),cudaHostAllocMapped));
@@ -82,9 +83,9 @@ int *stabilizeHopfieldNet(Graph g){
     
     while(!end){
         end=true;
-        for(int i=0;i<g.getSize();i++){
+        for(int i=0;i<g->getSize();i++){
             
-            statusUpdate<<<n_blocks,THREADS_PER_BLOCK>>>(adjmat,i,status,g.getSize(),res);
+            statusUpdate<<<n_blocks,THREADS_PER_BLOCK>>>(adjmat,i,status,g->getSize(),res);
             gpuErrCheck(cudaDeviceSynchronize());
             
             /*Sum partial results together*/
