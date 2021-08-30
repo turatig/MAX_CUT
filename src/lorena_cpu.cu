@@ -8,7 +8,7 @@
 
 #define Min(x,y) (fabs(x) < fabs(y) ? fabs(x) : fabs(y))
 
-#define EPSILON 0.1
+#define EPSILON 5
 #define PI 3.14159265358979323846
 
 /****************************************************************/
@@ -103,8 +103,9 @@ int *lorena_cpu::mapAndCut(int **adjmat,double *teta,int size){
 			B[i] += adjmat[i][j]*sin(teta[j]);
 		}
 	}
-
+    
     lorena_cpu::mappa_cerchio_unitario(adjmat,t,A,B,size);
+    //std::cout<<"Start cutting the mapped points\n";
     int *res=lorena_cpu::taglio_massimo(adjmat,t,size);
     free(A);
     free(B);
