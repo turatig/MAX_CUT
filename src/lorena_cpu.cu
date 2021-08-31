@@ -4,6 +4,7 @@
 #include <math.h>
 #include <time.h>
 #include "../inc/lorena_cpu.cuh"
+#include "../inc/utils.cuh"
 
 
 #define Min(x,y) (fabs(x) < fabs(y) ? fabs(x) : fabs(y))
@@ -89,6 +90,7 @@ void lorena_cpu::mappa_cerchio_unitario(int **adjmat,double *teta,double *A,doub
 }
 
 int *lorena_cpu::mapAndCut(int **adjmat,double *teta,int size){
+    double start,elapsed;
     double *t=(double*)malloc(size*sizeof(double));
     /*Hard copy value of teta to avoid external changes*/
     memcpy(t,teta,size*sizeof(double));
@@ -103,10 +105,17 @@ int *lorena_cpu::mapAndCut(int **adjmat,double *teta,int size){
 			B[i] += adjmat[i][j]*sin(teta[j]);
 		}
 	}
-    
+
+    start=cpuSecond();
     lorena_cpu::mappa_cerchio_unitario(adjmat,t,A,B,size);
-    //std::cout<<"Start cutting the mapped points\n";
+    elapsed=cpuSecond()-start;
+    std::cout<<"Lorena--mapping points: sequential implementation ended in "<<elapsed<<" sec\n";
+
+    start=cpuSecond();
     int *res=lorena_cpu::taglio_massimo(adjmat,t,size);
+    elapsed=cpuSecond()-start;
+    std::cout<<"Lorena--find best partition: sequential implementation ended in "<<elapsed<<" sec\n";
+
     free(A);
     free(B);
     return res;

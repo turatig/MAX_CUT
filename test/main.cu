@@ -13,10 +13,34 @@
 
 #define PI 3.14159265358979323846
 
-int main(){
+/*
+Driver program to test parallel implementation of the algorithms against sequential one.
+Call main size seed sparsity.
+    -size: the number of nodes in the graph
+    -seed: to reproduce the experiment
+    -sparsity: percentage of nodes connected (given as integer parameter e.g. 50 means approximately 50% of nodes connected)
+*/
+int main(int argc,char **argv){
     double start,elapsed;
+    int size, sparsity,seed;
+    if(argc<2){
+        std::cout<<"The size of the graph must be specified\n";
+        return -1;
+    }
+    size=atoi(argv[1]);
+    if(argc>=3){
+        seed=atoi(argv[2]);
+        srand(seed);
+    }
+    else
+       srand(time(NULL));
+    if(argc>=4)
+        sparsity=atoi(argv[3]);
+    else
+        sparsity=rand()%100;
 
-    Graph *g=new Graph(5000,50);
+    std::cout<<"Size: "<<size<<" Seed: "<<seed<<" Sparsity: "<<sparsity<<"\n";
+    Graph *g=new Graph(size,sparsity);
     start=cpuSecond();
     int * status_cpu=rete_cpu::stabilizza_rete_Hopfield(g->getAdjmat(),g->getSize());
     elapsed=cpuSecond()-start;
@@ -40,16 +64,18 @@ int main(){
 	for (int i=0; i<g->getSize(); i++)
 		teta[i] = (double) 2*PI*rand()/RAND_MAX;
     
-    start=cpuSecond();
+    //Execution time is logged in the function
     status_cpu=lorena_cpu::mapAndCut(g->getAdjmat(),teta,g->getSize());
-    elapsed=cpuSecond()-start;
-    std::cout<<"Lorena: sequential implementation ended in "<<elapsed<<" sec\n";
 
     start=cpuSecond();
     double *updated_teta=circleMap(g,teta);
-    status_gpu=lorena_cpu::taglio_massimo(g->getAdjmat(),updated_teta,g->getSize());
     elapsed=cpuSecond()-start;
-    std::cout<<"Lorena: parallel implementation ended in "<<elapsed<<" sec\n";
+    std::cout<<"Lorena--mapping points: parallel implementation ended in "<<elapsed<<" sec\n";
+
+    start=cpuSecond();
+    status_gpu=maximumCut(g,updated_teta);
+    elapsed=cpuSecond()-start;
+    std::cout<<"Lorena--find best partition: parallel implementation ended in "<<elapsed<<" sec\n";
 
 
     if(check_output(status_cpu,status_gpu,g->getSize()))
@@ -57,23 +83,11 @@ int main(){
     else
         std::cout<<"------ERROR: PARALLEL OUTPUT MUST AGREE WITH SEQUENTIAL ONE------\n";
     
-    free(updated_teta);
-    free(status_gpu);
-    start=cpuSecond();
-    updated_teta=circleMap(g,teta);
-    status_gpu=maximumCut(g,updated_teta);
-    elapsed=cpuSecond()-start;
-    std::cout<<"Lorena: parallel implementation(version 2) ended in "<<elapsed<<" sec\n";
-
-
-    if(check_output(status_cpu,status_gpu,g->getSize()))
-        std::cout<<"------SUCCESS------\n";
-    else
-        std::cout<<"------ERROR: PARALLEL OUTPUT MUST AGREE WITH SEQUENTIAL ONE------\n";
 
     free(status_cpu);
     free(status_gpu);
     free(teta);
+    free(updated_teta);
     delete g;
 
 }
