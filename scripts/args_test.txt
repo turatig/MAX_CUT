@@ -1,0 +1,4 @@
+Size: 16 Seed: 800159731 Sparsity 33
+Size: 32 Seed: 542193695 Sparsity 57
+Size: 64 Seed: 264704918 Sparsity 26
+Size: 128 Seed: 1944231311 Sparsity 40

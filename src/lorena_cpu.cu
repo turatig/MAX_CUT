@@ -1,4 +1,5 @@
 #include <iostream>
+#include <fstream>
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
@@ -23,9 +24,9 @@ void lorena_cpu::modifica_A_B(int *adjlist, double a, double b,double *A,double 
 
 /****************************************************************/
 
-double lorena_cpu::taglio(int **adjmat,int *r,int size) {
+long lorena_cpu::taglio(int **adjmat,int *r,int size) {
 	register int i,j;
-	double s=0;
+	long s=0;
 
 	for (i=0; i<size-1; i++){
 		for (j=i+1; j<size; j++){
@@ -39,8 +40,8 @@ double lorena_cpu::taglio(int **adjmat,int *r,int size) {
 /****************************************************************/
 
 int *lorena_cpu::taglio_massimo(int **adjmat,double *teta,int size) {
-	register int i,j,k;
-	register double t,T=0;
+	register int i,j;
+	register long t,T=0;
 	int *R;
     double max_alfa;
 	double alfa;
@@ -70,7 +71,7 @@ int *lorena_cpu::taglio_massimo(int **adjmat,double *teta,int size) {
 
 void lorena_cpu::mappa_cerchio_unitario(int **adjmat,double *teta,double *A,double *B,int size){
 	int OK = 1, nround = 0;
-	double p,alfa;
+	double alfa;
     
 	while ( OK ) {
 		nround++;
@@ -91,6 +92,11 @@ void lorena_cpu::mappa_cerchio_unitario(int **adjmat,double *teta,double *A,doub
 
 int *lorena_cpu::mapAndCut(int **adjmat,double *teta,int size){
     double start,elapsed;
+    long cost;
+
+    std::ofstream lor_seq_out;
+    lor_seq_out.open("lorena_sequential.txt",std::ios_base::app);
+
     double *t=(double*)malloc(size*sizeof(double));
     /*Hard copy value of teta to avoid external changes*/
     memcpy(t,teta,size*sizeof(double));
@@ -110,11 +116,14 @@ int *lorena_cpu::mapAndCut(int **adjmat,double *teta,int size){
     lorena_cpu::mappa_cerchio_unitario(adjmat,t,A,B,size);
     elapsed=cpuSecond()-start;
     std::cout<<"Lorena--mapping points: sequential implementation ended in "<<elapsed<<" sec\n";
+    lor_seq_out<<"(Map)"<<" Time: "<<elapsed<<"\n";
 
     start=cpuSecond();
     int *res=lorena_cpu::taglio_massimo(adjmat,t,size);
     elapsed=cpuSecond()-start;
     std::cout<<"Lorena--find best partition: sequential implementation ended in "<<elapsed<<" sec\n";
+    cost=taglio(adjmat,res,size);
+    lor_seq_out<<"(Cut)"<<" Time: "<<elapsed<<" Cost: "<<cost<<"\n";
 
     free(A);
     free(B);

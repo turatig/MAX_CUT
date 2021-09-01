@@ -130,7 +130,7 @@ double *circleMap(Graph *g,double *_teta){
     
     int n_blocks=(int)(g->getSize()+THREADS_PER_BLOCK-1)/THREADS_PER_BLOCK;
     
-	double p,alfa;
+	double alfa;
     
 	while(!end ) {
 		end = true;

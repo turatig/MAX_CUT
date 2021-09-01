@@ -36,7 +36,6 @@ void rete_cpu::energia(int **adjmat,int *stato_rete,int size)
 int *rete_cpu::stabilizza_rete_Hopfield(int **adjmat,int size) {
   register int i,j;
   int pred, FINE=1, somme;
-  int count=0;
   int *stato_rete=(int*)calloc(size,sizeof(int));
     
   while (FINE) {
