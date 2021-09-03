@@ -32,7 +32,7 @@ __global__ void modifica_A_B(int *adjlist,int k,double a, double b,double *A,dou
 /*
 Create a partition given a value for alpha
 */
-__global__ void makePartition(int *adjmat,int *partition,double alfa,double *teta,int size){
+__global__ void makePartition(int *partition,double alfa,double *teta,int size){
     int n=threadIdx.x+blockDim.x*blockIdx.x;
 
     if(n<size){
@@ -184,7 +184,7 @@ int *maximumCut(Graph *g,double *teta){
 		alfa = (teta[i] > PI) ? teta[i]-PI : teta[i];
         n_blocks=(int)(size+THREADS_PER_BLOCK-1)/THREADS_PER_BLOCK;
 
-        makePartition<<<n_blocks,THREADS_PER_BLOCK>>>(adjmat,partition,alfa,teta_gpu,size);
+        makePartition<<<n_blocks,THREADS_PER_BLOCK>>>(partition,alfa,teta_gpu,size);
         gpuErrCheck(cudaDeviceSynchronize());
 
         n_blocks=res_size;
@@ -202,7 +202,7 @@ int *maximumCut(Graph *g,double *teta){
     }
     std::cout<<"Lorena (parallel)->"<<max_cost<<"\n";
     int *res=(int*)malloc(size*sizeof(int));
-    makePartition<<<n_blocks,THREADS_PER_BLOCK>>>(adjmat,partition,max_alfa,teta_gpu,size);
+    makePartition<<<n_blocks,THREADS_PER_BLOCK>>>(partition,max_alfa,teta_gpu,size);
     gpuErrCheck(cudaMemcpy(res,partition,size*sizeof(int),cudaMemcpyDeviceToHost));
 
     cudaFree(res_gpu);
@@ -212,3 +212,4 @@ int *maximumCut(Graph *g,double *teta){
 
     return res;
 }
+

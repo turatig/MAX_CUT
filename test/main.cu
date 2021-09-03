@@ -8,6 +8,7 @@
 #include "../inc/rete_gpu.cuh"
 #include "../inc/lorena_cpu.cuh"
 #include "../inc/lorena_gpu.cuh"
+#include "../inc/lorena_batch.cuh"
 #include "../inc/Graph.cuh"
 #include "../inc/utils.cuh"
 
@@ -101,6 +102,17 @@ int main(int argc,char **argv){
     cost=lorena_cpu::taglio(g->getAdjmat(),status_gpu,g->getSize());
     lor_par_out<<"(Cut)"<<" Time: "<<elapsed<<" Cost: "<<cost<<"\n";
 
+
+    if(check_output(status_cpu,status_gpu,g->getSize()))
+        std::cout<<"------SUCCESS------\n";
+    else
+        std::cout<<"------ERROR: PARALLEL OUTPUT MUST AGREE WITH SEQUENTIAL ONE------\n";
+
+    start=cpuSecond();
+    status_gpu=maximumCutBatch(g,updated_teta,256);
+    elapsed=cpuSecond()-start;
+    std::cout<<"Lorena--find best partition: parallel batch implementation ended in "<<elapsed<<" sec\n";
+    lor_par_out<<"(Cut_Batch)"<<" Time: "<<elapsed<<"\n";
 
     if(check_output(status_cpu,status_gpu,g->getSize()))
         std::cout<<"------SUCCESS------\n";

@@ -20,6 +20,5 @@ int main(int argc, char **argv){
     for(int i=8;i<16;i++)
         args_file<<"Size: "<<(int)pow(2,i)<<" Seed: "<<rand()<<" Sparsity "<<(rand()%(upper-lower+1))+lower<<"\n";
 
-    args_file<<"Size: "<<40064<<" Seed: "<<rand()<<" Sparsity "<<(rand()%(upper-lower+1))+lower<<"\n";
     args_file.close();
 }

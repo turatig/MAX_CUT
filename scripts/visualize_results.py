@@ -1,8 +1,8 @@
 import matplotlib.pyplot as plt
+from random import randint
+from math import log2
 
 if __name__=="__main__":
-    log_files=["hopfield_sequential.txt","hopfield_parallel.txt",\
-                "lorena_sequential.txt","lorena_parallel.txt"]
     
     size=[]
     hs_time=[]
@@ -54,6 +54,8 @@ if __name__=="__main__":
     
     lp_map_time=[]
     lp_cut_time=[]
+    lpb_cut_time=[]
+
     with open("lorena_parallel.txt") as f:
         for line in f:
             line=line.split(" ")
@@ -62,7 +64,10 @@ if __name__=="__main__":
                 if line[0]=="(Map)":
                     lp_map_time.append(float(line[2]))
                 else:
-                    lp_cut_time.append(float(line[2]))
+                    if line[0]=="(Cut)":
+                        lp_cut_time.append(float(line[2]))
+                    else:
+                        lpb_cut_time.append(float(line[2]))
         f.close()
 
     fig,ax=plt.subplots()
@@ -80,18 +85,19 @@ if __name__=="__main__":
     ax.set_ylabel("Time")
     ax.plot(size,ls_cut_time,label="Sequential implementation",color="blue")
     ax.plot(size,lp_cut_time,label="Parallel implementation",color="red")
+    ax.plot(size,lpb_cut_time,label="Parallel implementation (Cut in batch)",color="green")
     ax.legend()
     fig.savefig("Lorena_cut_time.png")
-
-        
+ 
     fig,ax=plt.subplots()
     ax.set_title("Hopfield vs Lorena-solution's cost")
     ax.set_xlabel("Size (number of nodes)")
     ax.set_ylabel("Time")
-    width=5
-    ax.bar(size,hs_cost,width,label="Hopfield network",color="blue")
-    ax.bar([i+width for i in size],ls_cost,width,label="Lorena",color="red")
+    width=0.35
+    ax.bar([log2(i) for i in size],hs_cost,width,label="Hopfield network",color="blue")
+    ax.bar([log2(i)+width for i in size],ls_cost,width,label="Lorena",color="red")
+    ax.set_xticks([log2(i)+width for i in size])
+    ax.set_xticklabels(size)
     ax.legend()
     fig.savefig("Cost.png")
 
-    #print("-"*20+"Data visualized"+"-"*20)
