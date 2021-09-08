@@ -101,3 +101,12 @@ if __name__=="__main__":
     ax.legend()
     fig.savefig("Cost.png")
 
+    fig,ax=plt.subplots()
+    ax.set_title("Hopfield vs Lorena (parallel version)")
+    ax.set_xlabel("Size (number of nodes)")
+    ax.set_ylabel("Time")
+    ax.plot(size,hp_time,label="Hopfield Network",color="red")
+    ax.plot(size,[lp_map_time[i]+lpb_cut_time[i] for i in range(len(size))],label="Lorena",color="blue")
+    ax.legend()
+    fig.savefig("HopfieldVsLorena.png")
+

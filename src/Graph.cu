@@ -5,6 +5,10 @@
 #include "../inc/utils.cuh"
 #include "../inc/Graph.cuh"
 
+/*
+Create undirected graph, with a fraction of p nodes connected:
+    -allocates memory both on cpu and gpu
+*/
 Graph::Graph(int s,int p){
     size=s;
 
@@ -32,6 +36,9 @@ Graph::Graph(int s,int p){
     }
 }
 
+/*
+Create graph object from input file
+*/
 Graph::Graph(char *argv) {
     char s[11];
     FILE *in;

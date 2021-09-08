@@ -18,7 +18,8 @@ Update the status of cos/sin vectors during the mapping phase
 #define PI 3.14159265358979323846
 
 /*
-Update cos and sin for every node's angle depending on node's k adjiacency list
+Update cos and sin of every node's angle depending on node's k adjiacency list and
+    
 */
 __global__ void modifica_A_B(int *adjlist,int k,double a, double b,double *A,double *B,int size){
     int n=threadIdx.x+blockDim.x*blockIdx.x;

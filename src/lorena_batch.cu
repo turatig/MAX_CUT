@@ -112,8 +112,8 @@ __global__ void maxInBatch(int *res,int res_size,int batch_size,int *best_idx,lo
          This is equivalent to smem[n]= smem[n]>=smem[n+i] ? smem[n] : smem[n+i] but this does not introduce branch divergence
         */
         if(n<i){
-            sx=(int)(smem[n]>=smem[n+i]);
-            dx=(int)(smem[n]<smem[n+i]);
+            sx=(int)(smem[n]>smem[n+i]);
+            dx=(int)(smem[n]<=smem[n+i]);
             smem[n]=sx*smem[n]+dx*smem[n+i];
             smem_idx[n]=sx*smem_idx[n]+dx*smem_idx[n+i];
         }
@@ -124,8 +124,8 @@ __global__ void maxInBatch(int *res,int res_size,int batch_size,int *best_idx,lo
     Unrolling of the last five iterations (when only one warp is invloved) of the cycle to improve efficiency
     */
     if(n<i){
-        sx=(int)(smem[n]>=smem[n+i]);
-        dx=(int)(smem[n]<smem[n+i]);
+        sx=(int)(smem[n]>smem[n+i]);
+        dx=(int)(smem[n]<=smem[n+i]);
         smem[n]=sx*smem[n]+dx*smem[n+i];
         smem_idx[n]=sx*smem_idx[n]+dx*smem_idx[n+i];
     }
@@ -133,8 +133,8 @@ __global__ void maxInBatch(int *res,int res_size,int batch_size,int *best_idx,lo
     i>>=1;
 
     if(n<i){
-        sx=(int)(smem[n]>=smem[n+i]);
-        dx=(int)(smem[n]<smem[n+i]);
+        sx=(int)(smem[n]>smem[n+i]);
+        dx=(int)(smem[n]<=smem[n+i]);
         smem[n]=sx*smem[n]+dx*smem[n+i];
         smem_idx[n]=sx*smem_idx[n]+dx*smem_idx[n+i];
     }
@@ -142,8 +142,8 @@ __global__ void maxInBatch(int *res,int res_size,int batch_size,int *best_idx,lo
     i>>=1;
 
     if(n<i){
-        sx=(int)(smem[n]>=smem[n+i]);
-        dx=(int)(smem[n]<smem[n+i]);
+        sx=(int)(smem[n]>smem[n+i]);
+        dx=(int)(smem[n]<=smem[n+i]);
         smem[n]=sx*smem[n]+dx*smem[n+i];
         smem_idx[n]=sx*smem_idx[n]+dx*smem_idx[n+i];
     }
@@ -151,8 +151,8 @@ __global__ void maxInBatch(int *res,int res_size,int batch_size,int *best_idx,lo
     i>>=1;
 
     if(n<i){
-        sx=(int)(smem[n]>=smem[n+i]);
-        dx=(int)(smem[n]<smem[n+i]);
+        sx=(int)(smem[n]>smem[n+i]);
+        dx=(int)(smem[n]<=smem[n+i]);
         smem[n]=sx*smem[n]+dx*smem[n+i];
         smem_idx[n]=sx*smem_idx[n]+dx*smem_idx[n+i];
     }
@@ -160,8 +160,8 @@ __global__ void maxInBatch(int *res,int res_size,int batch_size,int *best_idx,lo
     i>>=1;
 
     if(n<i){
-        sx=(int)(smem[n]>=smem[n+i]);
-        dx=(int)(smem[n]<smem[n+i]);
+        sx=(int)(smem[n]>smem[n+i]);
+        dx=(int)(smem[n]<=smem[n+i]);
         smem[n]=sx*smem[n]+dx*smem[n+i];
         smem_idx[n]=sx*smem_idx[n]+dx*smem_idx[n+i];
     }
@@ -169,8 +169,8 @@ __global__ void maxInBatch(int *res,int res_size,int batch_size,int *best_idx,lo
     i>>=1;
 
     if(n<i){
-        sx=(int)(smem[n]>=smem[n+i]);
-        dx=(int)(smem[n]<smem[n+i]);
+        sx=(int)(smem[n]>smem[n+i]);
+        dx=(int)(smem[n]<=smem[n+i]);
         smem[n]=sx*smem[n]+dx*smem[n+i];
         smem_idx[n]=sx*smem_idx[n]+dx*smem_idx[n+i];
     }

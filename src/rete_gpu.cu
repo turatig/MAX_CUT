@@ -2,9 +2,6 @@
 Cuda kernel and functions used to optimize a Hopefield network while solving the max_cut problem
 */
 
-/*
-Update the status of the i-th node in the graph by summing
-*/
 #include <stdio.h>
 #include <iostream>
 #include "../inc/rete_gpu.cuh"
@@ -13,6 +10,14 @@ Update the status of the i-th node in the graph by summing
 
 #define THREADS_PER_BLOCK 256
 
+/*
+Update the status of i-th by summing status of node n weighted by weight in adjmat[i][n].
+    -adjmat: adjacency matrix
+    -node: idx of the i-th node
+    -status: status vector
+    -size: number of nodes in the graph
+    -res: partial results array. Sum is reduced in shared memory, so that partial results must summed outside the function.
+*/
 __global__ void statusUpdate(int *adjmat,int node,int *status,int size,int *res){
     /*declare smem to have a size equal to the double of the max number of threads per block*/
     __shared__ int smem[THREADS_PER_BLOCK];
@@ -53,6 +58,10 @@ __global__ void statusUpdate(int *adjmat,int node,int *status,int size,int *res)
     if(threadIdx.x==0) res[blockIdx.x]=smem[0];
 }
 
+/*
+Call gpu neurons update until the network is stable (i.e. no more neurons have changed their status)
+    -g: graph object
+*/
 int *stabilizeHopfieldNet(Graph *g){
     int *status;
     int *status_cpu;

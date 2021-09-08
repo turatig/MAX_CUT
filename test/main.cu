@@ -26,6 +26,10 @@ int main(int argc,char **argv){
     double start,elapsed;
     long cost;
     int size, sparsity,seed;
+    cudaDeviceProp dev_prop;
+
+    cudaGetDeviceProperties(&dev_prop,0);
+    std::cout<<"Zero-copy enabled: "<<dev_prop.canMapHostMemory<<"\n";
     
     std::ofstream hop_seq_out,hop_par_out,lor_seq_out,lor_par_out;
 
@@ -99,11 +103,11 @@ int main(int argc,char **argv){
     status_gpu=maximumCut(g,updated_teta);
     elapsed=cpuSecond()-start;
     std::cout<<"Lorena--find best partition: parallel implementation ended in "<<elapsed<<" sec\n";
-    cost=lorena_cpu::taglio(g->getAdjmat(),status_gpu,g->getSize());
+    //cost=lorena_cpu::taglio(g->getAdjmat(),status_gpu,g->getSize());
     lor_par_out<<"(Cut)"<<" Time: "<<elapsed<<" Cost: "<<cost<<"\n";
 
 
-    if(check_output(status_cpu,status_gpu,g->getSize()))
+    if(check_output(status_cpu,status_gpu,g->getSize()) || lorena_cpu::taglio(g->getAdjmat(),status_cpu,g->getSize())==lorena_cpu::taglio(g->getAdjmat(),status_gpu,g->getSize()))
         std::cout<<"------SUCCESS------\n";
     else
         std::cout<<"------ERROR: PARALLEL OUTPUT MUST AGREE WITH SEQUENTIAL ONE------\n";
@@ -112,9 +116,10 @@ int main(int argc,char **argv){
     status_gpu=maximumCutBatch(g,updated_teta,256);
     elapsed=cpuSecond()-start;
     std::cout<<"Lorena--find best partition: parallel batch implementation ended in "<<elapsed<<" sec\n";
+    std::cout<<"Partition's cost :"<<lorena_cpu::taglio(g->getAdjmat(),status_gpu,g->getSize())<<"\n";
     lor_par_out<<"(Cut_Batch)"<<" Time: "<<elapsed<<"\n";
 
-    if(check_output(status_cpu,status_gpu,g->getSize()))
+    if(check_output(status_cpu,status_gpu,g->getSize()) || lorena_cpu::taglio(g->getAdjmat(),status_cpu,g->getSize())==lorena_cpu::taglio(g->getAdjmat(),status_gpu,g->getSize()))
         std::cout<<"------SUCCESS------\n";
     else
         std::cout<<"------ERROR: PARALLEL OUTPUT MUST AGREE WITH SEQUENTIAL ONE------\n";

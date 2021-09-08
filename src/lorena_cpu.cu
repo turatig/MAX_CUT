@@ -48,6 +48,9 @@ int *lorena_cpu::taglio_massimo(int **adjmat,double *teta,int size) {
 
 	R = (int *) calloc(size,sizeof(int));
     int *res=(int*)malloc(size*sizeof(int));
+    
+    //Timeout inserted just for test porpouses
+    double start=cpuSecond();
 
 	for (i=0; i<size; i++) {
 		alfa = (teta[i] > PI) ? teta[i]-PI : teta[i];
@@ -58,7 +61,11 @@ int *lorena_cpu::taglio_massimo(int **adjmat,double *teta,int size) {
             T = t;
             max_alfa=alfa;
         }
-            
+
+        if(cpuSecond()-start>7200){
+            std::cout<<"Examined partition "<<i<<"\n";
+            break;
+        }
 	}
     
     /*Store the resulted partition and return the pointer*/

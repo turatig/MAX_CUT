@@ -11,7 +11,10 @@ double cpuSecond() {
 
 bool check_output(int *benchmark,int *tested,int size){
     for(int i=0;i<size;i++){
-        if(benchmark[i]!=tested[i]) return false;
+        if(benchmark[i]!=tested[i]){
+            std::cout<<"Mismatch at idx "<<i<<" "<<benchmark[i]<<" "<<tested[i]<<"\n";
+            return false;
+        }
     }
     return true;
 }
