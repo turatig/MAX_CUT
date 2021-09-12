@@ -1,0 +1,16 @@
+Size: 256
+Time: 0.000654936 Cost: 7510
+Size: 512
+Time: 0.00598001 Cost: 23004
+Size: 1024
+Time: 0.055449 Cost: 144708
+Size: 2048
+Time: 0.165889 Cost: 529573
+Size: 4096
+Time: 1.70289 Cost: 3101763
+Size: 8192
+Time: 9.23863 Cost: 11197161
+Size: 16384
+Time: 59.0084 Cost: 26535632
+Size: 32768
+Time: 430.718 Cost: 137949893

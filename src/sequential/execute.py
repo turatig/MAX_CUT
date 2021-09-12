@@ -7,7 +7,7 @@ if __name__=="__main__":
         exit()
     with open(sys.argv[1]) as f:
         for line in f:
-            cmd=["../main_parallel"]
+            cmd=["./main_sequential"]
             line=line.split(" ")
             cmd.append(line[1])
             cmd.append(line[3])

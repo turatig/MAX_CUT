@@ -4,8 +4,9 @@
 #include <stdlib.h>
 #include <math.h>
 #include <time.h>
-#include "../inc/lorena_cpu.cuh"
-#include "../inc/utils.cuh"
+#include <cstring>
+#include "lorena_cpu.h"
+#include "utils.h"
 
 
 #define Min(x,y) (fabs(x) < fabs(y) ? fabs(x) : fabs(y))
@@ -106,7 +107,7 @@ int *lorena_cpu::mapAndCut(int **adjmat,double *teta,int size){
 
     double *t=(double*)malloc(size*sizeof(double));
     /*Hard copy value of teta to avoid external changes*/
-    memcpy(t,teta,size*sizeof(double));
+    std::memcpy(t,teta,size*sizeof(double));
 
     double *A=(double*)malloc(size*sizeof(double));
     double *B=(double*)malloc(size*sizeof(double));

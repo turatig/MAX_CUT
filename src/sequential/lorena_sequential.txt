@@ -1,0 +1,16 @@
+(Map) Time: 0.00411105
+(Cut) Time: 0.0246301 Cost: 7541
+(Map) Time: 0.019423
+(Cut) Time: 0.179224 Cost: 22943
+(Map) Time: 0.157715
+(Cut) Time: 1.47132 Cost: 144719
+(Map) Time: 0.802468
+(Cut) Time: 11.6598 Cost: 529947
+(Map) Time: 8.13182
+(Cut) Time: 92.3286 Cost: 3102047
+(Map) Time: 54.6721
+(Cut) Time: 737.746 Cost: 11196174
+(Map) Time: 329.667
+(Cut) Time: 6039.53 Cost: 26532443
+(Map) Time: 2811.39
+(Cut) Time: 49529.9 Cost: 137941412

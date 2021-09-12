@@ -1,0 +1,8 @@
+Size: 256 Seed: 1766558155 Sparsity 42
+Size: 512 Seed: 462242284 Sparsity 32
+Size: 1024 Seed: 1180240780 Sparsity 53
+Size: 2048 Seed: 1930511760 Sparsity 49
+Size: 4096 Seed: 1982981230 Sparsity 73
+Size: 8192 Seed: 1825029946 Sparsity 66
+Size: 16384 Seed: 2038111938 Sparsity 39
+Size: 32768 Seed: 1183554599 Sparsity 51

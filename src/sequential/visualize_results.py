@@ -88,15 +88,6 @@ if __name__=="__main__":
     ax.plot(size,lpb_cut_time,label="Parallel implementation (Cut in batch)",color="green")
     ax.legend()
     fig.savefig("Lorena_cut_time.png")
-
-    fig,ax=plt.subplots()
-    ax.set_title("Lorena(Find maximum cut)-computation times (parallel versions)")
-    ax.set_xlabel("Size (number of nodes)")
-    ax.set_ylabel("Time")
-    ax.plot(size,lp_cut_time,label="Parallel implementation",color="red")
-    ax.plot(size,lpb_cut_time,label="Parallel implementation (Cut in batch)",color="green")
-    ax.legend()
-    fig.savefig("Lorena_cut_parallel.png")
  
     fig,ax=plt.subplots()
     ax.set_title("Hopfield vs Lorena-solution's cost")

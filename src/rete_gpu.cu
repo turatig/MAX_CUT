@@ -7,6 +7,7 @@ Cuda kernel and functions used to optimize a Hopefield network while solving the
 #include "../inc/rete_gpu.cuh"
 #include "../inc/Graph.cuh"
 #include "../inc/utils.cuh"
+#include <cuda_profiler_api.h>
 
 #define THREADS_PER_BLOCK 256
 
@@ -94,7 +95,9 @@ int *stabilizeHopfieldNet(Graph *g){
         end=true;
         for(int i=0;i<g->getSize();i++){
             
+            //cudaProfilerStart();
             statusUpdate<<<n_blocks,THREADS_PER_BLOCK>>>(adjmat,i,status,g->getSize(),res);
+            //cudaProfilerStop();
             gpuErrCheck(cudaDeviceSynchronize());
             
             /*Sum partial results together*/

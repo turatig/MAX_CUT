@@ -21,7 +21,7 @@ __global__ void makePartitionsBatch(int *partitions,int oset,int batch_size,doub
     double alfa;
 
     if(n<size*batch_size && k<size){
-		alfa = (int)(teta[k] > PI)*(teta[k]-PI) + (int)(teta[k] <= PI)*teta[k];
+	alfa = (int)(teta[k] > PI)*(teta[k]-PI) + (int)(teta[k] <= PI)*teta[k];
         /*Next instructions equivalent to the following conditional statement
         smem[i] = ((teta[n] >= alfa) && (teta[n] < alfa+PI)) ? 1 : -1;
         but do not introduce divergence
@@ -219,8 +219,7 @@ int *maximumCutBatch(Graph *g,double *teta,int batch_size){
         gpuErrCheck(cudaDeviceSynchronize());
         
         //__global__ void maxInBatch(int *res,int res_size,int batch_size,int best_idx,long best_cost){
-        n_blocks=(batch_size+THREADS_PER_BLOCK-1)/THREADS_PER_BLOCK;
-        maxInBatch<<<n_blocks,THREADS_PER_BLOCK>>>(res,res_size,batch_size,best_idx,best_cost);
+        maxInBatch<<<1,batch_size>>>(res,res_size,batch_size,best_idx,best_cost);
         gpuErrCheck(cudaDeviceSynchronize());
 
         gpuErrCheck(cudaMemcpy(&max_idx,best_idx,sizeof(int),cudaMemcpyDeviceToHost));
